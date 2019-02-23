@@ -1,7 +1,7 @@
 .app-header {
 	text-align: center;
 	background-color: #282c34;
-	font-size: calc(10px + 2vmin);
+	font-size: calc(10px + 1vmin);
 	color: white;
 	padding: 10px;
 }
