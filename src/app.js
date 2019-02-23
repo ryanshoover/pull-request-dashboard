@@ -9,12 +9,17 @@ class App extends Component {
 		this.state = {
 			pulls: [],
 		};
+
+		this.INTERVAL = 6000;
+
+		this.updatePullData.bind( this );
+		this.setState.bind( this );
 	}
 
 	componentDidMount() {
 		this.updatePullData();
 
-		setInterval( this.updatePullData, 60000 );
+		this.intervalID = setInterval( () => this.updatePullData(), this.INTERVAL );
 	}
 
 	updatePullData() {
@@ -29,7 +34,7 @@ class App extends Component {
 		return (
 			<div className="app">
 				<header className="app-header">
-					<h1>Pull Request Dashboard</h1>
+					<h1>Pull Requests</h1>
 				</header>
 				<main className="app-main">
 					<Reviewers pulls={ this.state.pulls } />

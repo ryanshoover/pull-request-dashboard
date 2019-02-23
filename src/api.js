@@ -43,8 +43,6 @@ function getPulls() {
 				pulls.forEach( pull => allPulls.push( pull ) );
 			 } );
 
-			console.log( allPulls.length );
-
 			resolve( allPulls );
 		} )
 		.catch( err => console.error( err ) );

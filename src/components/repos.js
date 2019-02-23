@@ -7,7 +7,6 @@ export default class Repos extends Component {
 
 		this.props.pulls.forEach( ( pull ) => {
 			const repo = pull.url.match( /\/repos\/[^/]+\/([^/]+)\// );
-			console.log( pull.url );
 			counts[ repo[1] ] = counts[ repo[1] ] || 0;
 			counts[ repo[1] ]++;
 		} );
