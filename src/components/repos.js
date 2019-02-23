@@ -3,14 +3,21 @@ import Section from './section';
 
 export default class Repos extends Component {
 	render() {
-		const repos = this.props.repos.filter( repo => {
-			return this.props.pulls[ repo.node_id ] && this.props.pulls[ repo.node_id ].length
+		let counts = {};
+
+		this.props.pulls.forEach( ( pull ) => {
+			const repo = pull.url.match( /\/repos\/[^/]+\/([^/]+)\// );
+			console.log( pull.url );
+			counts[ repo[1] ] = counts[ repo[1] ] || 0;
+			counts[ repo[1] ]++;
 		} );
+
+		let repos = Object.keys( counts ).sort();
 
 		const items = repos.map( repo => {
 			return {
-				label: repo.name,
-				y: this.props.pulls[ repo.node_id ].length,
+				label: repo,
+				y: counts[ repo ],
 			}
 		} );
 

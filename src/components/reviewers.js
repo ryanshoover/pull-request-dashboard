@@ -3,30 +3,21 @@ import Section from './section';
 
 export default class Reviewers extends Component {
 	render() {
-		let pulls = {},
-			reviewers = [];
+		let counts = {};
 
-		Object.keys( this.props.pulls ).forEach( ( key ) => {
-			this.props.pulls[ key ].forEach( pull => {
-				pull.requested_reviewers.forEach( reviewer => {
-					reviewers.push( reviewer.login );
-
-					pulls[ reviewer.login ] = pulls[ reviewer.login ] || [];
-					pulls[ reviewer.login ].push( pull );
-				} );
+		this.props.pulls.forEach( ( pull ) => {
+			pull.requested_reviewers.forEach( reviewer => {
+				counts[ reviewer.login ] = counts[ reviewer.login ] || 0;
+				counts[ reviewer.login]++;
 			} );
 		} );
 
-		reviewers = reviewers.filter( (assignee, index, self ) => {
-			return self.indexOf( assignee ) === index;
-		});
+		let reviewers = Object.keys( counts ).sort();
 
-		reviewers = reviewers.sort();
-
-		const items = reviewers.map( assignee => {
+		const items = reviewers.map( reviewer => {
 			return {
-				label: assignee,
-				y: pulls[ assignee ].length,
+				label: reviewer,
+				y: counts[ reviewer ],
 			}
 		} );
 

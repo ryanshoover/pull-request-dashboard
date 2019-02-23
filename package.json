@@ -4,12 +4,17 @@
   "private": true,
   "dependencies": {
     "canvasjs": "^1.8.1",
+    "debug": "~2.6.9",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "query-string": "^6.2.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5"
+    "react-scripts": "2.1.5",
+    "request": "^2.88.0"
   },
   "scripts": {
+    "server": "node bin/server",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

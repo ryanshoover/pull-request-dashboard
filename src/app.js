@@ -1,51 +1,28 @@
 import React, { Component } from 'react';
 import { Reviewers, Owners, Repos } from './components';
-import API from './api';
 import './app.css';
 
 class App extends Component {
 	constructor( props ) {
 		super( props );
 
-		this.api = new API();
-
 		this.state = {
-			repos: [],
-			pulls: {},
+			pulls: [],
 		};
 	}
 
 	componentDidMount() {
-		this.api.getTeamRepos( repos => {
-			if ( repos.error ) {
-				console.error( repos.error );
-				return;
-			}
+		this.updatePullData();
 
-			this.setState( {
-				repos: repos,
-			} );
-
-			repos.map( this.updatePRs );
-		} );
+		setInterval( this.updatePullData, 60000 );
 	}
 
-	updatePRs = ( repo ) => {
-		this.api.getPullRequests( repo.pulls_url, pulls => {
-			if ( pulls.error ) {
-				console.error( pulls.error );
-				return;
-			}
-
-			if ( ! pulls.length ) {
-				return;
-			}
-
-			this.setState( state => {
-				state.pulls[ repo.node_id ] = pulls;
-				return state;
+	updatePullData() {
+		fetch( '/pulls' )
+			.then( res => res.json() )
+			.then( data => {
+				this.setState( { pulls: data } );
 			} );
-		} );
 	}
 
 	render() {

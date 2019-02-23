@@ -1,52 +1,80 @@
-import queryString from 'query-string';
+const request = require('request');
 
-export default class API {
-	constructor() {
-		this.token = process.env.REACT_APP_GITHUB_TOKEN || '';
+let teamRepos;
+
+function getTeamRepos() {
+	const options = {
+		url: `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos`,
+		json: true,
+		headers: {
+			'Accept': 'application/vnd.github.v3+json',
+			'Authorization': 'token ' + process.env.GITHUB_TOKEN,
+			'User-Agent': 'pull-request-dashboard',
+		}
 	}
 
-	getTeamRepos( next ) {
-		const endpoint = 'https://api.github.com/teams/2531752/repos';
-		this.queryAPI( endpoint, {}, next );
-	}
-
-	getPullRequests( endpoint, next ) {
-		endpoint = endpoint.replace( /{[^}]*}$/, '' );
-
-		const params = {
-			state: 'open',
-			sort: 'created',
-			created: 'asc',
-		};
-
-		this.queryAPI( endpoint, params, next );
-	}
-
-	queryAPI( endpoint, params = {}, next ) {
-		const data = null;
-
-		if ( params.length ) {
-			endpoint += '?' + queryString.stringify( params );
+	return new Promise( ( resolve, reject ) => {
+		if ( teamRepos ) {
+			resolve( teamRepos );
 		}
 
-		const xhr = new XMLHttpRequest();
-		// xhr.withCredentials = true;
-
-		xhr.addEventListener( 'load', () => {
-			if ( 200 === xhr.status ) {
-				next( JSON.parse( xhr.responseText ) );
-			} else {
-				next( {
-					error: xhr.responseText,
-				} );
+		request( options, ( err, res, body ) => {
+			if ( err ) {
+				reject( err );
 			}
-		});
 
-		xhr.open( 'GET', endpoint );
+			teamRepos = body;
 
-		xhr.setRequestHeader( 'Accept', 'application/vnd.github.v3+json' );
-		xhr.setRequestHeader( 'Authorization', 'token ' + this.token );
-
-		xhr.send( data );
-	}
+			resolve( teamRepos );
+		} );
+	})
 }
+
+function getPulls() {
+	return new Promise( ( resolve ) => {
+		getTeamRepos()
+		.then( repos => {
+			return Promise.all( repos.map( getRepoPulls ) );
+		} )
+		.then( repos => {
+			const allPulls = [];
+
+			repos.forEach( pulls => {
+				pulls.forEach( pull => allPulls.push( pull ) );
+			 } );
+
+			console.log( allPulls.length );
+
+			resolve( allPulls );
+		} )
+		.catch( err => console.error( err ) );
+	} );
+}
+
+function getRepoPulls( repo ) {
+	const options = {
+		url: repo.pulls_url.replace( /{[^}]*}$/, '' ),
+		json: true,
+		headers: {
+			'Accept': 'application/vnd.github.v3+json',
+			'Authorization': 'token ' + process.env.GITHUB_TOKEN,
+			'User-Agent': 'pull-request-dashboard',
+		}
+	}
+
+	return new Promise( ( resolve, reject ) => {
+		request( options, ( err, res, body ) => {
+			if ( err ) {
+				console.log( err );
+				reject( err );
+			}
+
+			resolve( body );
+		} );
+	})
+}
+
+module.exports = {
+	getTeamRepos,
+	getPulls,
+};
