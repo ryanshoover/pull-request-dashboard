@@ -1,14 +1,30 @@
-.app {
-	text-align: center;
-}
-
 .app-header {
+	text-align: center;
 	background-color: #282c34;
-	min-height: 20vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 	font-size: calc(10px + 2vmin);
 	color: white;
+	padding: 10px;
+}
+
+.app-main {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
+}
+
+.section {
+	flex: 0 1 50%;
+	padding: 0 40px;
+	margin-top: 40px;
+}
+
+.section:last-child {
+	border-right: none;
+}
+
+.label {
+	font-weight: bold;
+	margin-right: 1rem;
 }
