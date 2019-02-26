@@ -1,9 +1,5 @@
-import Reviewers from './reviewers';
-import Owners from './owners';
-import Repos from './repos';
+import Section from './section';
 
 export {
-	Reviewers,
-	Owners,
-	Repos,
+	Section,
 };

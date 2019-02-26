@@ -15,12 +15,17 @@ function getTeamRepos() {
 
 	return new Promise( ( resolve, reject ) => {
 		if ( teamRepos ) {
+			console.log( teamRepos );
 			resolve( teamRepos );
 		}
 
 		request( options, ( err, res, body ) => {
 			if ( err ) {
 				reject( err );
+			}
+
+			if ( body.message || null ) {
+				reject( body.message );
 			}
 
 			teamRepos = body;
@@ -43,8 +48,9 @@ function getPulls() {
 				pulls.forEach( pull => allPulls.push( pull ) );
 			 } );
 
-			resolve( allPulls );
+			return processPulls( allPulls );
 		} )
+		.then( data => resolve( data ) )
 		.catch( err => console.error( err ) );
 	} );
 }
@@ -63,13 +69,47 @@ function getRepoPulls( repo ) {
 	return new Promise( ( resolve, reject ) => {
 		request( options, ( err, res, body ) => {
 			if ( err ) {
-				console.log( err );
 				reject( err );
+			}
+
+			if ( undefined !== typeof body.message ) {
+				reject( body.message );
 			}
 
 			resolve( body );
 		} );
 	})
+}
+
+function processPulls( pulls ) {
+	const counts = {
+		repos: {},
+		reviewers: {},
+		owners: {},
+	};
+
+	const data = {
+		repos: {},
+		reviewers: {},
+		owners: {},
+	};
+
+	pulls.forEach( ( pull ) => {
+		pull.requested_reviewers.forEach( reviewer => {
+			counts.reviewers[ reviewer.login ] = counts.reviewers[ reviewer.login ] || 0;
+			counts.reviewers[ reviewer.login]++;
+		} );
+
+		const owner = pull.assignee || pull.user;
+		counts.owners[ owner.login ] = counts.owners[ owner.login ] || 0;
+		counts.owners[ owner.login ]++;
+
+		const repo = pull.url.match( /\/repos\/[^/]+\/([^/]+)\// )[1];
+		counts.repos[ repo ] = counts.repos[ repo ] || 0;
+		counts.repos[ repo ]++;
+	} );
+
+	return data;
 }
 
 module.exports = {

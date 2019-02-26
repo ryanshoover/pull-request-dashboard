@@ -1,9 +1,11 @@
-var express = require('express');
-var pullsRouter = require('./routes/pulls');
+const express = require('express');
+const path = require('path');
+const homeRouter = require('./routes/home');
+const pullsRouter = require('./routes/pulls');
 
-var app = express();
+const app = express();
 
-// view engine setup
+app.use( '/', homeRouter );
 app.use('/pulls', pullsRouter);
 
 module.exports = app;

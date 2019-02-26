@@ -15,7 +15,7 @@
 }
 
 .section {
-	flex: 0 1 50%;
+	flex: 0 1 100%;
 	padding: 0 40px;
 	margin-top: 40px;
 }
@@ -27,4 +27,10 @@
 .label {
 	font-weight: bold;
 	margin-right: 1rem;
+}
+
+@media ( min-width: 1024px ) {
+	.section {
+		flex-basis: 50%;
+	}
 }

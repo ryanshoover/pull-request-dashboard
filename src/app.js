@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Reviewers, Owners, Repos } from './components';
+import { Section } from './components';
 import './app.css';
 
 class App extends Component {
@@ -7,10 +7,14 @@ class App extends Component {
 		super( props );
 
 		this.state = {
-			pulls: [],
+			pulls: {
+				reviewers: {},
+				owners: {},
+				repos: {},
+			},
 		};
 
-		this.INTERVAL = 6000;
+		this.INTERVAL = 60000;
 
 		this.updatePullData.bind( this );
 		this.setState.bind( this );
@@ -24,10 +28,18 @@ class App extends Component {
 
 	updatePullData() {
 		fetch( '/pulls' )
-			.then( res => res.json() )
+			.then( res => {
+				if ( 200 !== res.status ) {
+					throw new Error( res.statusText );
+				}
+
+				return res.json();
+			} )
 			.then( data => {
+				console.log( data );
 				this.setState( { pulls: data } );
-			} );
+			} )
+			.catch( err => console.error( err ) );
 	}
 
 	render() {
@@ -37,9 +49,9 @@ class App extends Component {
 					<h1>Pull Requests</h1>
 				</header>
 				<main className="app-main">
-					<Reviewers pulls={ this.state.pulls } />
-					<Owners pulls={ this.state.pulls } />
-					<Repos repos={ this.state.repos } pulls={ this.state.pulls } />
+					<Section title="Review Requests" data={ this.state.pulls.reviewers } />
+					<Section title="Open Pulls" data={ this.state.pulls.owners } />
+					<Section title="Repos" data={ this.state.pulls.repos } />
 				</main>
 			</div>
 		);
