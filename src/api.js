@@ -1,7 +1,5 @@
 const request = require('request');
 
-let teamRepos;
-
 function getTeamRepos() {
 	const options = {
 		url: `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos`,
@@ -14,23 +12,16 @@ function getTeamRepos() {
 	}
 
 	return new Promise( ( resolve, reject ) => {
-		if ( teamRepos ) {
-			console.log( teamRepos );
-			resolve( teamRepos );
-		}
-
 		request( options, ( err, res, body ) => {
 			if ( err ) {
 				reject( err );
 			}
 
-			if ( body.message || null ) {
+			if ( 'undefined' !== typeof body.message ) {
 				reject( body.message );
 			}
 
-			teamRepos = body;
-
-			resolve( teamRepos );
+			resolve( body );
 		} );
 	})
 }
@@ -51,7 +42,7 @@ function getPulls() {
 			return processPulls( allPulls );
 		} )
 		.then( data => resolve( data ) )
-		.catch( err => console.error( err ) );
+		.catch( err => console.error( 'getPulls catch', err ) );
 	} );
 }
 
@@ -72,7 +63,7 @@ function getRepoPulls( repo ) {
 				reject( err );
 			}
 
-			if ( undefined !== typeof body.message ) {
+			if ( 'undefined' !== typeof body.message ) {
 				reject( body.message );
 			}
 

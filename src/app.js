@@ -36,7 +36,6 @@ class App extends Component {
 				return res.json();
 			} )
 			.then( data => {
-				console.log( data );
 				this.setState( { pulls: data } );
 			} )
 			.catch( err => console.error( err ) );
