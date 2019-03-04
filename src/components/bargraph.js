@@ -2,16 +2,11 @@ import React, { Component } from 'react';
 import Chart from 'chart.js';
 import { colors } from '../config';
 
-export default class Section extends Component {
-
-	constructor() {
-		super();
-		this.chartID =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-	}
+export default class BarGraph extends Component {
 
 	componentDidUpdate() {
 		new Chart(
-			this.chartID,
+			this.props.id,
 			{
 				type: 'horizontalBar',
 				data: {
@@ -30,7 +25,6 @@ export default class Section extends Component {
 						fontSize: 32,
 						text: this.props.title,
 					},
-					scaleShowGridLines: false,
 					barShowStroke: false,
 					legend: {
 						display: false,
@@ -65,8 +59,8 @@ export default class Section extends Component {
 
 	render() {
 		return (
-			<section id={ this.props.title } className="section">
-				<canvas id={ this.chartID }></canvas>
+			<section className="bargraph">
+				<canvas id={ this.props.id }></canvas>
 			</section>
 		);
 	}

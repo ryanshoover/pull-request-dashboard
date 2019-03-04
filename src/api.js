@@ -1,4 +1,15 @@
-const request = require('request');
+const request = require( 'request' );
+const atob = require( 'atob' );
+const debug = require('debug')('pull-request-backend:server');
+
+let reqOptions = {
+	json: true,
+	headers: {
+		'Accept': 'application/vnd.github.v3+json',
+		'Authorization': 'token ' + process.env.GITHUB_TOKEN,
+		'User-Agent': 'pull-request-dashboard',
+	}
+};
 
 function getPulls() {
 	return new Promise( ( resolve ) => {
@@ -18,26 +29,36 @@ function getPulls() {
 	} );
 }
 
+function getProducts() {
+	return new Promise( ( resolve ) => {
+		getTeamRepos()
+		.then( repos => Promise.all( repos.map( getComposer ) ) )
+		.then( composers => processComposers( composers ) )
+		.then( data => resolve( data ) )
+		.catch( err => console.error( 'getProducts catch', err ) );
+	} );
+}
+
 function getTeamRepos() {
-	const options = {
-		url: `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos`,
-		json: true,
-		headers: {
-			'Accept': 'application/vnd.github.v3+json',
-			'Authorization': 'token ' + process.env.GITHUB_TOKEN,
-			'User-Agent': 'pull-request-dashboard',
-		}
-	}
+	reqOptions.url = `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos`;
 
 	return new Promise( ( resolve, reject ) => {
-		request( options, ( err, res, body ) => {
+		request( reqOptions, ( err, res, body ) => {
 			if ( err ) {
 				reject( err );
 			}
 
-			if ( 'undefined' !== typeof body.message ) {
-				reject( body.message );
+			if ( 'object' !== typeof body ) {
+				reject( 'Body is not an object' );
+				return;
 			}
+
+			if ( body.hasOwnProperty( 'message' ) ) {
+				reject( body.message );
+				return;
+			}
+
+			debug( 'Number of repos', body.length );
 
 			resolve( body );
 		} );
@@ -45,24 +66,22 @@ function getTeamRepos() {
 }
 
 function getRepoPulls( repo ) {
-	const options = {
-		url: repo.pulls_url.replace( /{[^}]*}$/, '' ),
-		json: true,
-		headers: {
-			'Accept': 'application/vnd.github.v3+json',
-			'Authorization': 'token ' + process.env.GITHUB_TOKEN,
-			'User-Agent': 'pull-request-dashboard',
-		}
-	}
+	reqOptions.url = repo.pulls_url.replace( /{[^}]*}$/, '' );
 
 	return new Promise( ( resolve, reject ) => {
-		request( options, ( err, res, body ) => {
+		request( reqOptions, ( err, res, body ) => {
 			if ( err ) {
 				reject( err );
 			}
 
-			if ( 'undefined' !== typeof body.message ) {
+			if ( 'object' !== typeof body ) {
+				reject( 'Body is not an object' );
+				return;
+			}
+
+			if ( body.hasOwnProperty( 'message' ) ) {
 				reject( body.message );
+				return;
 			}
 
 			resolve( body );
@@ -97,6 +116,63 @@ function processPulls( pulls ) {
 	} );
 }
 
+function getComposer( repo ) {
+	reqOptions.url = repo.contents_url.replace( /{\+path}$/, 'composer.json' );
+
+	return new Promise( ( resolve, reject ) => {
+		request( reqOptions, ( err, res, body ) => {
+			if ( err ) {
+				reject( err );
+			}
+
+			if ( 'object' !== typeof body ) {
+				reject( 'Body is not an object' );
+				return;
+			}
+
+			if ( body.hasOwnProperty( 'message' ) ) {
+				debug( 'No composer', repo.name );
+				resolve( {} );
+				return;
+			}
+
+			debug( 'Found composer', repo.name );
+
+			const composer = JSON.parse( atob( body.content ) );
+
+			resolve( composer );
+		} );
+	})
+}
+
+function processComposers( composers ) {
+	const products = [];
+
+	composers.forEach( composer => {
+		if ( ! composer.hasOwnProperty( 'name' ) ) {
+			return;
+		}
+
+		const product = {
+			name: composer.name.replace( 'wpengine/', '' ),
+			type: composer.type,
+		};
+
+		const dependencies = composer.hasOwnProperty( 'require' ) ? Object.keys( composer.require ) : [];
+
+		dependencies.forEach( dependency => {
+			const parts = dependency.split( '/' );
+			product[ parts[0] ] = product[ parts[0] ] || [];
+			product[ parts[0] ].push( parts[1] );
+		} );
+
+		products.push( product );
+	} );
+
+	return products;
+}
+
 module.exports = {
 	getPulls,
+	getProducts,
 };

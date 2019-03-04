@@ -6,7 +6,7 @@
 	padding: 10px;
 }
 
-.app-main {
+.pulls {
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: center;
@@ -14,18 +14,14 @@
 	margin: 0 auto;
 }
 
-.section {
+.bargraph {
 	flex: 0 1 100%;
 	padding: 0 40px;
 	margin-top: 40px;
 }
 
-.section:last-child {
-	border-right: none;
-}
-
 @media ( min-width: 1024px ) {
-	.section {
+	.bargraph {
 		flex-basis: 50%;
 	}
 }
