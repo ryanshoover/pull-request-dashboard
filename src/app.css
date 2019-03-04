@@ -24,11 +24,6 @@
 	border-right: none;
 }
 
-.label {
-	font-weight: bold;
-	margin-right: 1rem;
-}
-
 @media ( min-width: 1024px ) {
 	.section {
 		flex-basis: 50%;
