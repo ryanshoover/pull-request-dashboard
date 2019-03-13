@@ -5,8 +5,11 @@ import { colors } from '../config';
 export default class BarGraph extends Component {
 
 	componentDidUpdate() {
+		console.log( 'labels', Object.keys( this.props.data ) );
+		console.log( 'values', Object.values( this.props.data ) );
+
 		new Chart(
-			this.props.id,
+			this.canvas.getContext( '2d' ),
 			{
 				type: 'horizontalBar',
 				data: {
@@ -60,7 +63,7 @@ export default class BarGraph extends Component {
 	render() {
 		return (
 			<section className="bargraph">
-				<canvas id={ this.props.id }></canvas>
+				<canvas ref={ canvas => this.canvas = canvas } />
 			</section>
 		);
 	}

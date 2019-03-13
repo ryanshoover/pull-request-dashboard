@@ -22,9 +22,9 @@ export default class DependencyTree extends Component {
 		const datasets = this.calcDataSets();
 
 		new Chart(
-			this.props.id,
+			this.canvas.getContext( '2d' ),
 			{
-				type: 'polarArea',
+				type: 'radar',
 				data: {
 					labels: this.categories,
 					datasets: datasets,
@@ -42,6 +42,11 @@ export default class DependencyTree extends Component {
 
 	calcDataSets() {
 		const datasets = [];
+		console.log( this.props.data );
+
+		if ( ! this.props.data || ! this.props.data.length ) {
+			return datasets;
+		}
 
 		this.props.data.forEach( data => {
 			const values = [];
@@ -64,7 +69,7 @@ export default class DependencyTree extends Component {
 
 	render() {
 		return (
-			<canvas id={ this.props.id } className="depedencytree"></canvas>
+			<canvas ref={ canvas => this.canvas = canvas } className="depedencytree" />
 		);
 	}
 }

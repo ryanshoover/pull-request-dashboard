@@ -40,7 +40,7 @@ function getProducts() {
 }
 
 function getTeamRepos() {
-	reqOptions.url = `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos`;
+	reqOptions.url = `https://api.github.com/teams/${ process.env.GITHUB_TEAM }/repos?per_page=100`;
 
 	return new Promise( ( resolve, reject ) => {
 		request( reqOptions, ( err, res, body ) => {
@@ -58,9 +58,11 @@ function getTeamRepos() {
 				return;
 			}
 
-			debug( 'Number of repos', body.length );
+			const repos = body.filter( repo => repo.permissions.admin );
 
-			resolve( body );
+			debug( 'Number of repos', repos.length );
+
+			resolve( repos );
 		} );
 	})
 }
