@@ -4,6 +4,26 @@ Shows the status of pull requests from a collection of repositories
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Running Loaclly
+
+Install dependencies:
+
+```
+yarn install
+```
+
+Build the site:
+
+```
+yarn run build
+```
+
+Run the app:
+
+```
+yarn start
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
