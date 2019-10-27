@@ -6,8 +6,8 @@ const router = express.Router();
 router.get( '/', function( req, res ) {
 	const baseDir = path.dirname( path.dirname( __dirname ) );
 
-	router.use( express.static( path.join( baseDir, 'build' ) ) );
-	res.sendFile( path.join( baseDir, 'build', 'index.html' ) );
+	router.use( express.static( path.join( baseDir, 'dist' ) ) );
+	res.sendFile( path.join( baseDir, 'dist', 'index.html' ) );
 } );
 
 module.exports = router;

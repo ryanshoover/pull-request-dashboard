@@ -5,9 +5,6 @@ import { colors } from '../config';
 export default class BarGraph extends Component {
 
 	componentDidUpdate() {
-		console.log( 'labels', Object.keys( this.props.data ) );
-		console.log( 'values', Object.values( this.props.data ) );
-
 		new Chart(
 			this.canvas.getContext( '2d' ),
 			{

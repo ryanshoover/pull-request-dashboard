@@ -29,11 +29,24 @@ function getPulls() {
 	} );
 }
 
-function getProducts() {
+function getDependencies() {
 	return new Promise( ( resolve ) => {
 		getTeamRepos()
+		.then( repoData => {
+			const repos = [];
+
+			for ( const repo of repoData ) {
+				repos.push( {
+					name: repo.full_name,
+					composer: [],
+					package: [],
+				} );
+			}
+
+			return repos;
+		} )
 		.then( repos => Promise.all( repos.map( getComposer ) ) )
-		.then( composers => processComposers( composers ) )
+		.then( repos => Promise.all( repos.map( getPackage ) ) )
 		.then( data => resolve( data ) )
 		.catch( err => console.error( 'getProducts catch', err ) );
 	} );
@@ -119,7 +132,7 @@ function processPulls( pulls ) {
 }
 
 function getComposer( repo ) {
-	reqOptions.url = repo.contents_url.replace( /{\+path}$/, 'composer.json' );
+	reqOptions.url = `https://api.github.com/repos/${ repo.name }/contents/composer.json`;
 
 	return new Promise( ( resolve, reject ) => {
 		request( reqOptions, ( err, res, body ) => {
@@ -134,7 +147,7 @@ function getComposer( repo ) {
 
 			if ( body.hasOwnProperty( 'message' ) ) {
 				debug( 'No composer', repo.name );
-				resolve( {} );
+				resolve( repo );
 				return;
 			}
 
@@ -142,39 +155,50 @@ function getComposer( repo ) {
 
 			const composer = JSON.parse( atob( body.content ) );
 
-			resolve( composer );
+			const requires = composer.hasOwnProperty( 'require' ) ? Object.keys( composer.require ) : [];
+			const requireDevs = composer.hasOwnProperty( 'require-dev' ) ? Object.keys( composer['require-dev'] ) : [];
+
+			repo.composer = [ ...requires, ...requireDevs ];
+
+			resolve( repo );
 		} );
-	})
+	} );
 }
 
-function processComposers( composers ) {
-	const products = [];
+function getPackage( repo ) {
+	reqOptions.url = `https://api.github.com/repos/${ repo.name }/contents/package.json`;
 
-	composers.forEach( composer => {
-		if ( ! composer.hasOwnProperty( 'name' ) ) {
-			return;
-		}
+	return new Promise( ( resolve, reject ) => {
+		request( reqOptions, ( err, res, body ) => {
+			if ( err ) {
+				reject( err );
+			}
 
-		const product = {
-			name: composer.name.replace( 'wpengine/', '' ),
-			type: composer.type,
-		};
+			if ( 'object' !== typeof body ) {
+				reject( 'Body is not an object' );
+				return;
+			}
 
-		const dependencies = composer.hasOwnProperty( 'require' ) ? Object.keys( composer.require ) : [];
+			if ( body.hasOwnProperty( 'message' ) ) {
+				debug( 'No package', repo.name );
+				resolve( repo );
+				return;
+			}
 
-		dependencies.forEach( dependency => {
-			const parts = dependency.split( '/' );
-			product[ parts[0] ] = product[ parts[0] ] || [];
-			product[ parts[0] ].push( parts[1] );
+			debug( 'Found package', repo.name );
+
+			const packg = JSON.parse( atob( body.content ) );
+			const dependencies = packg.hasOwnProperty( 'dependencies' ) ? Object.keys( packg.dependencies ) : [];
+			const devDependencies = packg.hasOwnProperty( 'devDependencies' ) ? Object.keys( packg.devDependencies ) : [];
+
+			repo.package = [ ...dependencies, ...devDependencies ];
+
+			resolve( repo );
 		} );
-
-		products.push( product );
 	} );
-
-	return products;
 }
 
 module.exports = {
 	getPulls,
-	getProducts,
+	getDependencies,
 };

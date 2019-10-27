@@ -12,23 +12,25 @@ class App extends Component {
 				owners: {},
 				repos: {},
 			},
+			dependencies: [],
 		};
 
 		this.INTERVAL = 60000;
 
-		this.updatePullData.bind( this );
+		this.updateData = this.updateData.bind( this );
 		this.setState.bind( this );
 	}
 
 	componentDidMount() {
-		this.updatePullData();
-		this.updateProductData();
+		for ( const type of [ 'pulls', 'dependencies' ] ) {
+			this.updateData( type );
+		}
 
 		this.intervalID = setInterval( () => this.updatePullData(), this.INTERVAL );
 	}
 
-	updatePullData() {
-		fetch( '/api/pulls' )
+	updateData( type ) {
+		fetch( `/api/${ type }` )
 			.then( res => {
 				if ( 200 !== res.status ) {
 					throw new Error( res.statusText );
@@ -37,22 +39,11 @@ class App extends Component {
 				return res.json();
 			} )
 			.then( data => {
-				this.setState( { pulls: data } );
-			} )
-			.catch( err => console.error( err ) );
-	}
+				const state = this.state;
 
-	updateProductData() {
-		fetch( '/api/products' )
-			.then( res => {
-				if ( 200 !== res.status ) {
-					throw new Error( res.statusText );
-				}
+				state[ type ] = data;
 
-				return res.json();
-			} )
-			.then( data => {
-				this.setState( { products: data } );
+				this.setState( state );
 			} )
 			.catch( err => console.error( err ) );
 	}
@@ -69,7 +60,7 @@ class App extends Component {
 					<BarGraph title="Repos" data={ this.state.pulls.repos } />
 				</main>
 				<main className="products">
-					<DependencyTree title="Products" data={ this.state.products } />
+					<DependencyTree title="Products" dependencies={ this.state.dependencies } />
 				</main>
 			</div>
 		);

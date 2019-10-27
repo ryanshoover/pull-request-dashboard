@@ -1,75 +1,62 @@
 import React, { Component } from 'react';
-import Chart from 'chart.js';
-import { colors } from '../config';
 
 export default class DependencyTree extends Component {
 
 	constructor() {
 		super();
 
-		this.categories = [
-			'wpengine',
-			'studiopress',
-			'wpackagist-plugin',
-			'wpackagist-muplugin',
-			'wpackagist-theme',
-			'beaver-builder',
-			'wpmudev',
-		];
+		this.state = {
+			repo: '',
+			package: '',
+		};
+
+		this.onRepoChange = this.onRepoChange.bind( this );
 	}
 
-	componentDidUpdate() {
-		const datasets = this.calcDataSets();
-
-		new Chart(
-			this.canvas.getContext( '2d' ),
-			{
-				type: 'radar',
-				data: {
-					labels: this.categories,
-					datasets: datasets,
-				},
-				options: {
-					title: {
-						display: true,
-						fontSize: 32,
-						text: this.props.title,
-					},
-				},
-			}
-		);
-	}
-
-	calcDataSets() {
-		const datasets = [];
-		console.log( this.props.data );
-
-		if ( ! this.props.data || ! this.props.data.length ) {
-			return datasets;
-		}
-
-		this.props.data.forEach( data => {
-			const values = [];
-
-			this.categories.forEach( category => {
-				values.push( data.hasOwnProperty( category ) ? data[ category ].length : 0 ) ;
-			} );
-
-			datasets.push(
-				{
-					label: data.name,
-					data: values,
-					backgroundColor: colors,
-				}
-			);
+	onRepoChange( event ) {
+		this.setState( {
+			repo: event.target.value,
 		} );
-
-		return datasets;
 	}
 
 	render() {
+		const optionsRepo = [];
+
+		for ( const repo of this.props.dependencies ) {
+			optionsRepo.push( (
+				<option value={ repo.name } selected={ this.state.repo === repo.name } key={ repo.name }>
+					{ repo.name }
+				</option>
+			) );
+		}
+
+		const repo = this.props.dependencies.find( dependency => dependency.name === this.state.repo );
+		const composerItems = [];
+		const packageItems = [];
+
+		if ( repo ) {
+			for ( const composer of repo.composer ) {
+				composerItems.push( ( <li key={ composer }>{ composer }</li> ) );
+			}
+
+			for ( const packg of repo.package ) {
+				packageItems.push( ( <li key={ packg }>{ packg }</li> ) );
+			}
+		}
+
 		return (
-			<canvas ref={ canvas => this.canvas = canvas } className="depedencytree" />
+			<>
+				<label htmlFor="repo">Choose a repo to see its dependencies</label>
+				<select onChange={ this.onRepoChange } id="repo">
+					{ optionsRepo }
+				</select>
+				<h2>{ this.state.repo || 'Select a repo' }</h2>
+				<h3>Composer</h3>
+				<ul>{ composerItems }</ul>
+				<h3>Package</h3>
+				<ul>{ packageItems }</ul>
+			</>
+
 		);
 	}
 }
