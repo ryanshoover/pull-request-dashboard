@@ -26,7 +26,7 @@ class App extends Component {
 			this.updateData( type );
 		}
 
-		this.intervalID = setInterval( () => this.updatePullData(), this.INTERVAL );
+		this.intervalID = setInterval( () => this.updateData( 'pulls' ), this.INTERVAL );
 	}
 
 	updateData( type ) {
@@ -59,6 +59,9 @@ class App extends Component {
 					<BarGraph title="Open Pulls" data={ this.state.pulls.owners } />
 					<BarGraph title="Repos" data={ this.state.pulls.repos } />
 				</main>
+				<header className="app-header">
+					<h1>Repos &amp; Dependencies</h1>
+				</header>
 				<main className="products">
 					<DependencyTree title="Products" dependencies={ this.state.dependencies } />
 				</main>
