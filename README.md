@@ -6,6 +6,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Running Loaclly
 
+Add local environment values to a `.env` file in this project's root directory
+
+```shell
+NODE_ENV=development
+GITHUB_TOKEN=your-github-token-with-read-access
+GITHUB_TEAM=your-github-team-id-number
+SERVER_PORT=3000
+DEBUG=pull-request-backend:server
+```
+
 Install dependencies:
 
 ```
