@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Section } from './components';
+import { BarGraph, DependencyTree } from './components';
 import './app.css';
 
 class App extends Component {
@@ -12,22 +12,25 @@ class App extends Component {
 				owners: {},
 				repos: {},
 			},
+			dependencies: [],
 		};
 
 		this.INTERVAL = 60000;
 
-		this.updatePullData.bind( this );
+		this.updateData = this.updateData.bind( this );
 		this.setState.bind( this );
 	}
 
 	componentDidMount() {
-		this.updatePullData();
+		for ( const type of [ 'pulls', 'dependencies' ] ) {
+			this.updateData( type );
+		}
 
-		this.intervalID = setInterval( () => this.updatePullData(), this.INTERVAL );
+		this.intervalID = setInterval( () => this.updateData( 'pulls' ), this.INTERVAL );
 	}
 
-	updatePullData() {
-		fetch( '/pulls' )
+	updateData( type ) {
+		fetch( `/api/${ type }` )
 			.then( res => {
 				if ( 200 !== res.status ) {
 					throw new Error( res.statusText );
@@ -36,7 +39,11 @@ class App extends Component {
 				return res.json();
 			} )
 			.then( data => {
-				this.setState( { pulls: data } );
+				const state = this.state;
+
+				state[ type ] = data;
+
+				this.setState( state );
 			} )
 			.catch( err => console.error( err ) );
 	}
@@ -47,10 +54,16 @@ class App extends Component {
 				<header className="app-header">
 					<h1>Pull Requests</h1>
 				</header>
-				<main className="app-main">
-					<Section title="Review Requests" data={ this.state.pulls.reviewers } />
-					<Section title="Open Pulls" data={ this.state.pulls.owners } />
-					<Section title="Repos" data={ this.state.pulls.repos } />
+				<main className="pulls">
+					<BarGraph title="Review Requests" data={ this.state.pulls.reviewers } />
+					<BarGraph title="Open Pulls" data={ this.state.pulls.owners } />
+					<BarGraph title="Repos" data={ this.state.pulls.repos } />
+				</main>
+				<header className="app-header">
+					<h1>Repos &amp; Dependencies</h1>
+				</header>
+				<main className="products">
+					<DependencyTree title="Products" dependencies={ this.state.dependencies } />
 				</main>
 			</div>
 		);

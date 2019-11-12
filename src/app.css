@@ -1,3 +1,8 @@
+body {
+	font-size: 16px;
+	line-height: 1.5;
+}
+
 .app-header {
 	text-align: center;
 	background-color: #282c34;
@@ -6,7 +11,11 @@
 	padding: 10px;
 }
 
-.app-main {
+.app-header:not(:first-child) {
+	margin-top: 200px;
+}
+
+.pulls {
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: center;
@@ -14,18 +23,42 @@
 	margin: 0 auto;
 }
 
-.section {
+.bargraph {
 	flex: 0 1 100%;
 	padding: 0 40px;
 	margin-top: 40px;
 }
 
-.section:last-child {
-	border-right: none;
+.products {
+	padding: 40px;
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+.products .form {
+	flex: 0 0 100%;
+}
+
+.products .results {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+.products .dependencies {
+	flex: 1 0 50%;
+	min-width: 250px;
+}
+
+label {
+	padding-right: 1em;
+}
+
+select {
+	font-size: 1rem;
 }
 
 @media ( min-width: 1024px ) {
-	.section {
+	.bargraph {
 		flex-basis: 50%;
 	}
 }

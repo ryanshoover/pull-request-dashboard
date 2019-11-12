@@ -1,5 +1,7 @@
-import Section from './section';
+import BarGraph from './bargraph';
+import DependencyTree from './dependencytree';
 
 export {
-	Section,
+	DependencyTree,
+	BarGraph,
 };
