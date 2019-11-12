@@ -36,6 +36,9 @@ export default class DependencyTree extends Component {
 		const packageItems = [];
 		const repoItems = [];
 
+		let composerDeps = [];
+		let packageDeps = [];
+
 		for ( const repo of this.props.dependencies ) {
 			optionsRepo.push( (
 				<option value={ repo.name }>
@@ -43,16 +46,20 @@ export default class DependencyTree extends Component {
 				</option>
 			) );
 
-			const packgs = [ ...repo.composer, ...repo.package ];
-			packgs.sort();
+			composerDeps = [ ...composerDeps, ...repo.composer ];
+			packageDeps = [ ...packageDeps, ...repo.package ];
+		}
 
-			for ( const packg of packgs ) {
-				optionsPackages.push( (
-					<option value={ packg }>
-						{ packg }
-					</option>
-				) );
-			}
+		composerDeps.sort();
+		packageDeps.sort();
+		const packgs = new Set( [ ...composerDeps, ...packageDeps ] );
+
+		for ( const packg of packgs.values() ) {
+			optionsPackages.push( (
+				<option value={ packg }>
+					{ packg }
+				</option>
+			) );
 		}
 
 		if ( repo ) {
