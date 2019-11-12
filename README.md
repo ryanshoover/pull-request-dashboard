@@ -4,7 +4,7 @@ Shows the status of pull requests from a collection of repositories
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Running Loaclly
+## Running Locally
 
 Add local environment values to a `.env` file in this project's root directory
 
