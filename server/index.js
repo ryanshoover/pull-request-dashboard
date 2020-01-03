@@ -1,4 +1,6 @@
 const express = require('express');
+const ipfilter = require('express-ipfilter').IpFilter;
+const IpDeniedError = require('express-ipfilter').IpDeniedError;
 const path = require('path');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
@@ -13,38 +15,42 @@ const dependenciesRouter = require('./routes/dependencies');
 
 const isDev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 5000;
+const ips = process.env.IP_WHITELIST ? process.env.IP_WHITELIST.split(',') : ['127.0.0.1', '::1'];
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
-  console.error(`Node cluster master ${process.pid} is running`);
+	console.error(`Node cluster master ${process.pid} is running`);
 
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+	// Fork workers.
+	for (let i = 0; i < numCPUs; i++) {
+		cluster.fork();
+	}
 
-  cluster.on('exit', (worker, code, signal) => {
-    console.error(`Node cluster worker ${worker.process.pid} exited: code ${code}, signal ${signal}`);
-  });
+	cluster.on('exit', (worker, code, signal) => {
+		console.error(`Node cluster worker ${worker.process.pid} exited: code ${code}, signal ${signal}`);
+	});
 
 } else {
-  const app = express();
+	const app = express();
 
-  // Priority serve any static files.
-  app.use( express.static( path.resolve( __dirname, '../react-ui/build' ) ) );
+	// Block access to all but our allowed IP addresses.
+	app.use(ipfilter(ips, { mode: 'allow' }))
 
-  // Answer API requests.
-  app.use( '/api/repos', reposRouter );
-  app.use( '/api/pulls', pullsRouter );
-  app.use( '/api/dependencies', dependenciesRouter );
+	// Priority serve any static files.
+	app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
-  // All remaining requests return the React app, so it can handle routing.
-  app.get('*', function(request, response) {
-    debug( 'Request', request );
-    response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
-  });
+	// Answer API requests.
+	app.use('/api/repos', reposRouter);
+	app.use('/api/pulls', pullsRouter);
+	app.use('/api/dependencies', dependenciesRouter);
 
-  app.listen(PORT, function () {
-    console.error(`Node ${isDev ? 'dev server' : 'cluster worker '+process.pid}: listening on port ${PORT}`);
-  });
+	// All remaining requests return the React app, so it can handle routing.
+	app.get('*', function (request, response) {
+		debug('Request', request);
+		response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
+	});
+
+	app.listen(PORT, function () {
+		console.error(`Node ${isDev ? 'dev server' : 'cluster worker ' + process.pid}: listening on port ${PORT}`);
+	});
 }
