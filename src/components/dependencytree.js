@@ -41,7 +41,7 @@ export default class DependencyTree extends Component {
 
 		for ( const repo of this.props.dependencies ) {
 			optionsRepo.push( (
-				<option value={ repo.name }>
+				<option value={ repo.name } key={ repo.name }>
 					{ repo.name }
 				</option>
 			) );
@@ -56,7 +56,7 @@ export default class DependencyTree extends Component {
 
 		for ( const packg of packgs.values() ) {
 			optionsPackages.push( (
-				<option value={ packg }>
+				<option value={ packg } key={ packg }>
 					{ packg }
 				</option>
 			) );

@@ -6,6 +6,8 @@ class App extends Component {
 	constructor( props ) {
 		super( props );
 
+		this.props = props;
+
 		this.state = {
 			pulls: {
 				reviewers: {},
@@ -52,7 +54,7 @@ class App extends Component {
 		return (
 			<div className="app">
 				<header className="app-header">
-					<h1>Pull Requests</h1>
+					<h1>{ this.props.title }</h1>
 				</header>
 				<main className="pulls">
 					<BarGraph title="Review Requests" data={ this.state.pulls.reviewers } />
