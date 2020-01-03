@@ -1,7 +1,6 @@
 {
     "name": "pull-request-dashboard",
     "version": "0.1.0",
-    "private": true,
     "dependencies": {
         "@babel/core": "7.6.4",
         "@svgr/webpack": "4.3.3",
