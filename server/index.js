@@ -39,6 +39,7 @@ if (!isDev && cluster.isMaster) {
 	// Block access to all but our allowed IP addresses.
 	ipfilterConfig = {
 		mode: 'allow',
+		trustProxy: true,
 		excluding: [
 			'/api/*',
 		],
