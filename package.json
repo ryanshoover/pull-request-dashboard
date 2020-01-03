@@ -1,0 +1,23 @@
+{
+    "name": "pull-request-dashboard",
+    "version": "2.0.0",
+    "description": "GitHub Pull Request Dashboard",
+    "repository": "git@github.com:ryanshoover/pull-request-dashboard.git",
+    "author": "Ryan Hoover <ryanshoover@gmail.com>",
+    "license": "MIT",
+    "engines": {
+        "node": "12.x"
+    },
+    "scripts": {
+        "start": "node server",
+        "build": "cd react-ui/ && yarn install && yarn run build"
+    },
+    "cacheDirectories": [
+        "node_modules",
+        "react-ui/node_modules"
+    ],
+    "dependencies": {
+        "express": "^4.16.4"
+    },
+    "devDependencies": {}
+}
