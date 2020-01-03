@@ -1,2 +1,1 @@
-web: bin/boot
-worker: yarn server
+web: yarn start
