@@ -1,29 +1,10 @@
 const express = require('express');
 const ipfilter = require('express-ipfilter').IpFilter;
-const IpDeniedError = require('express-ipfilter').IpDeniedError;
+const cors = require('cors');
 const path = require('path');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const debug = require('debug')('pull-request-backend:server');
-
-
-var os = require('os');
-var ifaces = os.networkInterfaces();
-
-Object.keys(ifaces).forEach(function (ifname) {
-  var alias = 0;
-
-  ifaces[ifname].forEach(function (iface) {
-    if (alias >= 1) {
-      // this single interface has multiple ipv4 addresses
-      console.log(ifname + ':' + alias, iface.address);
-    } else {
-      // this interface has only one ipv4 adress
-      console.log(ifname, iface.address);
-    }
-    ++alias;
-  });
-});
 
 // Ensure environment variables are read.
 require('./config');
@@ -53,15 +34,22 @@ if (!isDev && cluster.isMaster) {
 	const app = express();
 
 	// Block access to all but our allowed IP addresses.
-	app.use(ipfilter(ips, { mode: 'allow' }))
+	ipfilterConfig = {
+		mode: 'allow',
+		excluding: [
+			'/api/*',
+		],
+	};
+
+	app.use( ipfilter( ips, ipfilterConfig ) );
 
 	// Priority serve any static files.
 	app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
 	// Answer API requests.
-	app.use('/api/repos', reposRouter);
-	app.use('/api/pulls', pullsRouter);
-	app.use('/api/dependencies', dependenciesRouter);
+	app.use('/api/repos', cors(), reposRouter);
+	app.use('/api/pulls', cors(), pullsRouter);
+	app.use('/api/dependencies', cors(), dependenciesRouter);
 
 	// All remaining requests return the React app, so it can handle routing.
 	app.get('*', function (request, response) {
