@@ -41,7 +41,7 @@ if (!isDev && cluster.isMaster) {
 		],
 	};
 
-	app.use( ipfilter( ips, ipfilterConfig ) );
+	// app.use( ipfilter( ips, ipfilterConfig ) );
 
 	// Priority serve any static files.
 	app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
