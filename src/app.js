@@ -17,7 +17,7 @@ class App extends Component {
 			dependencies: [],
 		};
 
-		this.INTERVAL = 60000;
+		this.INTERVAL = 60000 * 5; // 5 minutes
 
 		this.updateData = this.updateData.bind( this );
 		this.setState.bind( this );
