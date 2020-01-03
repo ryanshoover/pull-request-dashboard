@@ -2,6 +2,10 @@ const express = require('express');
 const path = require('path');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
+const debug = require('debug')('pull-request-backend:server');
+
+// Ensure environment variables are read.
+require('./config');
 
 const reposRouter = require('./routes/repos');
 const pullsRouter = require('./routes/pulls');
@@ -36,6 +40,7 @@ if (!isDev && cluster.isMaster) {
 
   // All remaining requests return the React app, so it can handle routing.
   app.get('*', function(request, response) {
+    debug( 'Request', request );
     response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
   });
 
