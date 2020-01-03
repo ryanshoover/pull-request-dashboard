@@ -153,7 +153,14 @@ function getComposer( repo ) {
 
 			debug( 'Found composer', repo.name );
 
-			const composer = JSON.parse( atob( body.content ) );
+			let composer;
+
+			try {
+				composer = JSON.parse( atob( body.content ) );
+			} catch ( error ) {
+				console.error( error );
+				reject( error );
+			}
 
 			const requires = composer.hasOwnProperty( 'require' ) ? Object.keys( composer.require ) : [];
 			const requireDevs = composer.hasOwnProperty( 'require-dev' ) ? Object.keys( composer['require-dev'] ) : [];
