@@ -33,6 +33,9 @@ if (!isDev && cluster.isMaster) {
 } else {
 	const app = express();
 
+	// Trust proxies for Heroku
+	app.enable('trust proxy');
+
 	// Block access to all but our allowed IP addresses.
 	ipfilterConfig = {
 		mode: 'allow',
@@ -46,6 +49,13 @@ if (!isDev && cluster.isMaster) {
 	// Priority serve any static files.
 	app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
+	app.use(
+		( request, response ) => {
+			console.log( 'proxy enabled', app.enabled('trust proxy') );
+			console.log( request.ip, request.ips );
+		}
+	);
+
 	// Answer API requests.
 	app.use('/api/repos', cors(), reposRouter);
 	app.use('/api/pulls', cors(), pullsRouter);
@@ -53,8 +63,7 @@ if (!isDev && cluster.isMaster) {
 
 	// All remaining requests return the React app, so it can handle routing.
 	app.get('*', function (request, response) {
-		console.log('Request', request);
-		response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
+		response.sendFile( path.resolve( __dirname, '../react-ui/build', 'index.html' ) );
 	});
 
 	app.listen(PORT, function () {
