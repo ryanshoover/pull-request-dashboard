@@ -6,6 +6,25 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const debug = require('debug')('pull-request-backend:server');
 
+
+var os = require('os');
+var ifaces = os.networkInterfaces();
+
+Object.keys(ifaces).forEach(function (ifname) {
+  var alias = 0;
+
+  ifaces[ifname].forEach(function (iface) {
+    if (alias >= 1) {
+      // this single interface has multiple ipv4 addresses
+      console.log(ifname + ':' + alias, iface.address);
+    } else {
+      // this interface has only one ipv4 adress
+      console.log(ifname, iface.address);
+    }
+    ++alias;
+  });
+});
+
 // Ensure environment variables are read.
 require('./config');
 
