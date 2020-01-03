@@ -1,2 +1,2 @@
-web: bin/compile dist
+web: bin/boot
 worker: yarn server
