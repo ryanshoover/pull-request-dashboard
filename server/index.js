@@ -53,7 +53,7 @@ if (!isDev && cluster.isMaster) {
 
 	// All remaining requests return the React app, so it can handle routing.
 	app.get('*', function (request, response) {
-		debug('Request', request);
+		console.log('Request', request);
 		response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
 	});
 
