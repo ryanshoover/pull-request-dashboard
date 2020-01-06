@@ -35,21 +35,18 @@ export default class BarGraph extends Component {
 								display: false,
 							},
 							ticks: {
+								fontSize: 24,
 								beginAtZero: true,
 								stepSize: 1,
-							},
-							scaleLabel: {
-								fontSize: 18,
 							},
 						} ],
 						yAxes: [ {
 							gridLines: {
 								display: false,
 							},
-							scaleLabel: {
-								display: true,
-								fontSize: 18,
-							},
+							ticks: {
+								fontSize: 36,
+							}
 						} ],
 					},
 				},
