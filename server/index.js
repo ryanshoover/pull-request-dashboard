@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express');
 const ipfilter = require('express-ipfilter').IpFilter;
 const cors = require('cors');
