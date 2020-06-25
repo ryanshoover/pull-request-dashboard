@@ -206,10 +206,10 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-express-ipfilter@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/express-ipfilter/-/express-ipfilter-1.1.1.tgz#d70ac60b941ccacb95df3eb6df06975476f16e93"
-  integrity sha512-OnmVTWvpNsRM5EjjynorLpavU1KWm8SU/TnNUw9qoYXp3dQ03C2wRCwhZO67xZy0NoCUODebSYHAaGAdzkd0hQ==
+express-ipfilter@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/express-ipfilter/-/express-ipfilter-1.1.2.tgz#536e1b8922f00df45d6da8796b02a75b1033a20f"
+  integrity sha512-dm1G3sVxlSbcOWSxfUTCo20ySyNQXJ4hJD5fuQJFoZlhkQvpbuDGBlh8AbFm1GwX85EWvfyhekOkvcydaXkBkg==
   dependencies:
     ip "~1.1.0"
     lodash "^4.17.11"
