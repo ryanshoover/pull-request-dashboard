@@ -17,7 +17,7 @@
         "atob": "^2.1.2",
         "cors": "^2.8.5",
         "debug": "^4.1.1",
-        "dotenv": "^8.2.0",
+        "dotenv": "^9.0.2",
         "dotenv-expand": "^5.1.0",
         "express": "^4.16.4",
         "express-ipfilter": "^1.1.2",
